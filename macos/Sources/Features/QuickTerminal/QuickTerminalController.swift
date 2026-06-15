@@ -150,6 +150,9 @@ class QuickTerminalController: BaseTerminalController {
         // Remove all of our notificationcenter subscriptions
         let center = NotificationCenter.default
         center.removeObserver(self)
+        // tabManager was registered as the observer for the move/goto-tab
+        // notifications (not self), so remove it explicitly.
+        center.removeObserver(tabManager)
 
         // Make sure we restore our hidden dock
         hiddenDock = nil
