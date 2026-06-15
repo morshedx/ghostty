@@ -603,6 +603,7 @@ class QuickTerminalTabManager: ObservableObject {
         } else if tabIndex == GHOSTTY_GOTO_TAB_NEXT.rawValue {
             selectNextTab()
         } else if tabIndex == GHOSTTY_GOTO_TAB_LAST.rawValue {
+            guard !tabs.isEmpty else { return }
             selectTab(tabs[tabs.count - 1])
         } else if tabIndex > 0 {
             // Numeric tab index (1-indexed)
