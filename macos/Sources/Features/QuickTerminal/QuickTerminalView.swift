@@ -2,15 +2,16 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct QuickTerminalView: View {
-    let ghostty: Ghostty.App
+    @ObservedObject var ghostty: Ghostty.App
 
     var controller: QuickTerminalController
     @ObservedObject var tabManager: QuickTerminalTabManager
 
     var body: some View {
+        let tabBarPosition = ghostty.config.quickTerminalTabBarPosition
         VStack(spacing: 0) {
-            if tabManager.tabs.count > 1 {
-                QuickTerminalTabBarView(ghostty: ghostty, tabManager: tabManager)
+            if tabBarPosition == .top {
+                tabBar
             }
             TerminalView(
                 ghostty: ghostty,
@@ -25,6 +26,15 @@ struct QuickTerminalView: View {
                 }
                 return false
             }
+            if tabBarPosition == .bottom {
+                tabBar
+            }
+        }
+    }
+
+    @ViewBuilder private var tabBar: some View {
+        if tabManager.tabs.count > 1 {
+            QuickTerminalTabBarView(ghostty: ghostty, tabManager: tabManager)
         }
     }
 }

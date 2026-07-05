@@ -563,6 +563,16 @@ extension Ghostty {
             return QuickTerminalPosition(rawValue: str) ?? .top
         }
 
+        var quickTerminalTabBarPosition: QuickTerminalTabBarPosition {
+            guard let config = self.config else { return .top }
+            var v: UnsafePointer<Int8>?
+            let key = "quick-terminal-tab-bar-position"
+            guard ghostty_config_get(config, &v, key, UInt(key.lengthOfBytes(using: .utf8))) else { return .top }
+            guard let ptr = v else { return .top }
+            let str = String(cString: ptr)
+            return QuickTerminalTabBarPosition(rawValue: str) ?? .top
+        }
+
         var quickTerminalScreen: QuickTerminalScreen {
             guard let config = self.config else { return .main }
             var v: UnsafePointer<Int8>?

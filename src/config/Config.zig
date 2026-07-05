@@ -2624,6 +2624,17 @@ keybind: Keybinds = .{},
 /// To enable this feature, bind the `toggle_quick_terminal` action to a key.
 @"quick-terminal-position": QuickTerminalPosition = .top,
 
+/// The position of the tab bar within the quick terminal window when
+/// more than one tab is open.
+///
+/// Valid values are:
+///
+///   * `top` - Tab bar appears above the terminal surface.
+///   * `bottom` - Tab bar appears below the terminal surface.
+///
+/// This configuration is only supported on macOS.
+@"quick-terminal-tab-bar-position": QuickTerminalTabBarPosition = .top,
+
 /// The size of the quick terminal.
 ///
 /// The size can be specified either as a percentage of the screen dimensions
@@ -9264,6 +9275,12 @@ pub const QuickTerminalPosition = enum {
     left,
     right,
     center,
+};
+
+/// See quick-terminal-tab-bar-position
+pub const QuickTerminalTabBarPosition = enum {
+    top,
+    bottom,
 };
 
 /// See quick-terminal-layer

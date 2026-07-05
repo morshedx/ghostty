@@ -1,5 +1,12 @@
 import Cocoa
 
+/// The position of the tab bar within the quick terminal window.
+/// See the `quick-terminal-tab-bar-position` configuration.
+enum QuickTerminalTabBarPosition: String {
+    case top
+    case bottom
+}
+
 enum QuickTerminalPosition: String {
     case top
     case bottom
