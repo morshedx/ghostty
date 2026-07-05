@@ -33,9 +33,14 @@ class GlobalEventTap {
     // If enabling fails due to permissions, this will start a timer to retry since
     // accessibility permissions take affect immediately.
     func enable() {
-        if eventTap != nil {
-            // Already enabled
-            return
+        if let eventTap {
+            // If the tap exists and is still enabled then we're done. If it
+            // exists but is disabled then the system killed it (e.g. because
+            // accessibility permissions were revoked or the app's TCC grant
+            // went stale), so we destroy it and recreate it below.
+            if CGEvent.tapIsEnabled(tap: eventTap) { return }
+            Self.logger.warning("global event tap exists but was disabled by the system, recreating")
+            disable()
         }
 
         // If we are already trying to enable, then stop the timer and restart it.
