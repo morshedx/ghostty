@@ -53,9 +53,9 @@ struct QuickTerminalTabBarView: View {
             }
         } else {
             if isHoveringNewTabButton {
-                configuredTinted(by: 0.15)
+                configuredTinted(by: 0.22)
             } else {
-                ghostty.config.backgroundColor.opacity(ghostty.config.backgroundOpacity)
+                configuredTinted(by: 0.12)
             }
         }
     }
@@ -154,14 +154,13 @@ struct QuickTerminalTabBarView: View {
         Button {
             tabManager.addNewTab()
         } label: {
+            // iTerm2-style circular "+" button at the trailing edge of the bar.
             Image(systemName: "plus")
+                .font(.system(size: 11, weight: .semibold))
                 .foregroundColor(Color(NSColor.secondaryLabelColor))
+                .frame(width: Constants.addNewTabButtonSize, height: Constants.addNewTabButtonSize)
+                .background(Circle().fill(newTabButtonBackgroundColor))
                 .padding(.horizontal, Constants.addNewTabButtonHorizontalPadding)
-                .frame(width: Constants.height, height: Constants.height)
-                .background(
-                    Rectangle()
-                        .fill(newTabButtonBackgroundColor)
-                )
         }
         .buttonStyle(.plain)
         .onHover { isHovering in
@@ -209,17 +208,14 @@ struct QuickTerminalTabBarView: View {
             tabManager: tabManager
         )
         .frame(maxWidth: .infinity)
-
-        Divider()
-            .background(Color(NSColor.separatorColor))
     }
 }
 
 extension QuickTerminalTabBarView {
     enum Constants {
-        static let height: CGFloat = 24
-        static let addNewTabButtonHorizontalPadding: CGFloat = 8
-        static let addNewTabButtonSize: CGFloat = 50
+        static let height: CGFloat = 28
+        static let addNewTabButtonHorizontalPadding: CGFloat = 6
+        static let addNewTabButtonSize: CGFloat = 20
         static let dropPlaceholderWidth: CGFloat = QuickTerminalTabItemView.Constants.minWidth
     }
 }

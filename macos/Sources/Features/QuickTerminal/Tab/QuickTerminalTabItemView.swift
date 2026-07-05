@@ -54,37 +54,51 @@ struct QuickTerminalTabItemView: View {
     private var hoverTint: CGFloat { isGlassEnabled ? 0.30 : 0.20 }
     private var inactiveTint: CGFloat { isGlassEnabled ? 0.55 : 0.35 }
 
-    private var backgroundColor: Color {
-        if isHighlighted { return Color(surfaceColor).opacity(surfaceOpacity) }
-        let opacity = surfaceOpacity * inactiveGlassOpacity
-        if isHovering { return tinted(by: hoverTint, opacity: opacity) }
-        return tinted(by: inactiveTint, opacity: opacity)
+    /// The active tab is drawn as an iTerm2-style capsule "pill" that sits
+    /// on the bar background; inactive tabs have no background at all.
+    private var pillBackgroundColor: Color {
+        tinted(by: isGlassEnabled ? 0.28 : 0.16, opacity: surfaceOpacity)
+    }
+
+    private var pillBorderColor: Color {
+        primaryForeground.opacity(0.3)
+    }
+
+    private var hoverPillColor: Color {
+        tinted(by: isGlassEnabled ? 0.18 : 0.08, opacity: surfaceOpacity * inactiveGlassOpacity)
     }
 
     private var closeButtonBackgroundColor: Color {
-        isHoveringCloseButton ? tinted(by: 0.45) : backgroundColor
+        isHoveringCloseButton ? tinted(by: 0.45) : Color.clear
     }
 
     private var primaryForeground: Color { Color(contrastColor) }
     private var secondaryForeground: Color { primaryForeground.opacity(0.6) }
 
     var body: some View {
-        HStack(spacing: Constants.horizontalSpacing) {
-            renderCloseButton()
-            renderTitle()
-            renderColorIndicator()
-            if let shortcut = shortcut {
-                renderShortcut(shortcut)
+        ZStack {
+            // Centered "title ⌘N" group, iTerm2-style.
+            HStack(spacing: Constants.horizontalSpacing) {
+                renderTitle()
+                renderColorIndicator()
+                if let shortcut = shortcut {
+                    renderShortcut(shortcut)
+                }
             }
+            .padding(.horizontal, Constants.contentHorizontalPadding)
+
+            // Close button pinned to the leading edge, visible on hover.
+            HStack {
+                renderCloseButton()
+                Spacer()
+            }
+            .padding(.leading, Constants.horizontalPadding)
         }
-        .padding(.horizontal, Constants.horizontalPadding)
         .frame(height: Constants.height)
         .frame(minWidth: Constants.minWidth, maxWidth: .infinity)
-        .background(
-            Rectangle()
-                .fill(backgroundColor)
-                .onMiddleClick(perform: onClose)
-        )
+        .background(renderPill())
+        .contentShape(Rectangle())
+        .onMiddleClick(perform: onClose)
         .onHover { isHovering in
             self.isHovering = isHovering
         }
@@ -100,6 +114,24 @@ struct QuickTerminalTabItemView: View {
             DispatchQueue.main.async {
                 onSelect()
             }
+        }
+    }
+
+    @ViewBuilder private func renderPill() -> some View {
+        if isHighlighted {
+            RoundedRectangle(cornerRadius: Constants.pillCornerRadius)
+                .fill(pillBackgroundColor)
+                .overlay(
+                    RoundedRectangle(cornerRadius: Constants.pillCornerRadius)
+                        .stroke(pillBorderColor, lineWidth: 1)
+                )
+                .padding(.vertical, Constants.pillVerticalInset)
+                .padding(.horizontal, Constants.pillHorizontalInset)
+        } else if isHovering {
+            RoundedRectangle(cornerRadius: Constants.pillCornerRadius)
+                .fill(hoverPillColor)
+                .padding(.vertical, Constants.pillVerticalInset)
+                .padding(.horizontal, Constants.pillHorizontalInset)
         }
     }
 
@@ -136,7 +168,6 @@ struct QuickTerminalTabItemView: View {
             .foregroundColor(isHighlighted ? primaryForeground : secondaryForeground)
             .lineLimit(Constants.titleLineLimit)
             .truncationMode(.tail)
-            .frame(minWidth: 0, maxWidth: .infinity)
     }
 
     @ViewBuilder private func renderShortcut(_ shortcut: KeyboardShortcut) -> some View {
@@ -150,9 +181,13 @@ struct QuickTerminalTabItemView: View {
 extension QuickTerminalTabItemView {
     enum Constants {
         static let minWidth: CGFloat = 180
-        static let height: CGFloat = 24
+        static let height: CGFloat = 28
         static let horizontalSpacing: CGFloat = 4
         static let horizontalPadding: CGFloat = 8
+        static let contentHorizontalPadding: CGFloat = 28
+        static let pillVerticalInset: CGFloat = 3
+        static let pillHorizontalInset: CGFloat = 4
+        static let pillCornerRadius: CGFloat = 6
         static let closeButtonPadding: CGFloat = 2
         static let closeButtonCornerRadius: CGSize = .init(width: 4, height: 4)
         static let closeButtonFontSize: CGFloat = 10
