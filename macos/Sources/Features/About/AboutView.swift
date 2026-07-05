@@ -32,9 +32,10 @@ struct AboutView: View {
 
         var url: URL? {
             switch self {
-            case .stable(let version):
-                let slug = version.replacingOccurrences(of: ".", with: "-")
-                return URL(string: "https://ghostty.org/docs/install/release-notes/\(slug)")
+            case .stable:
+                // This fork publishes its own releases; upstream's release
+                // notes don't exist for these versions.
+                return URL(string: "https://github.com/morshedx/ghostty/releases/latest")
             default:
                 return nil
             }
